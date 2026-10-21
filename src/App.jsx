@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { validateForm } from "./validation";
 import "./App.css";
 
@@ -16,10 +16,24 @@ const INITIAL_ERRORS = {
   confirmPassword: "",
 };
 
+const FIELD_ORDER = ["fullName", "email", "password", "confirmPassword"];
+
 function App() {
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState(INITIAL_ERRORS);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [focusTarget, setFocusTarget] = useState(null);
+
+  const fullNameRef = useRef(null);
+  const successHeadingRef = useRef(null);
+
+  useEffect(() => {
+    if (focusTarget === "success") {
+      successHeadingRef.current?.focus();
+    } else if (focusTarget === "form") {
+      fullNameRef.current?.focus();
+    }
+  }, [focusTarget]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -40,22 +54,24 @@ function App() {
     const validationErrors = validateForm(formData);
     setErrors(validationErrors);
 
-    const hasErrors = Object.values(validationErrors).some(
-      (message) => message !== ""
+    const firstInvalidField = FIELD_ORDER.find(
+      (field) => validationErrors[field] !== ""
     );
 
-    if (hasErrors) {
+    if (firstInvalidField) {
+      document.getElementById(firstInvalidField)?.focus();
       return;
     }
 
-    // نجاح: عرض توضيحي فقط — لا إرسال لأي خادم، ولا تخزين لكلمات المرور.
     setFormData(INITIAL_FORM_DATA);
     setErrors(INITIAL_ERRORS);
     setIsSubmitted(true);
+    setFocusTarget("success");
   }
 
   function handleReset() {
     setIsSubmitted(false);
+    setFocusTarget("form");
   }
 
   return (
@@ -64,7 +80,9 @@ function App() {
         {isSubmitted ? (
           <div role="status">
             <header className="card__header card__header--success">
-              <h1 id="form-title">Account created successfully</h1>
+              <h1 id="form-title" ref={successHeadingRef} tabIndex={-1}>
+                Account created successfully
+              </h1>
               <p>
                 This is a front-end demonstration — no data was sent to any
                 server.
@@ -99,7 +117,8 @@ function App() {
                   placeholder="Jane Doe"
                   value={formData.fullName}
                   onChange={handleChange}
-                  aria-invalid={Boolean(errors.fullName)}
+                  ref={fullNameRef}
+                  aria-invalid={errors.fullName ? "true" : undefined}
                   aria-describedby={
                     errors.fullName ? "fullName-error" : undefined
                   }
@@ -123,7 +142,7 @@ function App() {
                   placeholder="jane@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  aria-invalid={Boolean(errors.email)}
+                  aria-invalid={errors.email ? "true" : undefined}
                   aria-describedby={errors.email ? "email-error" : undefined}
                 />
                 {errors.email && (
@@ -145,7 +164,7 @@ function App() {
                   placeholder="At least 8 characters"
                   value={formData.password}
                   onChange={handleChange}
-                  aria-invalid={Boolean(errors.password)}
+                  aria-invalid={errors.password ? "true" : undefined}
                   aria-describedby={
                     errors.password ? "password-error" : undefined
                   }
@@ -169,7 +188,7 @@ function App() {
                   placeholder="Re-enter your password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  aria-invalid={Boolean(errors.confirmPassword)}
+                  aria-invalid={errors.confirmPassword ? "true" : undefined}
                   aria-describedby={
                     errors.confirmPassword
                       ? "confirmPassword-error"

@@ -148,3 +148,7 @@
   font-size: 0.8rem;
   text-align: center;
 }
+
+.card__header--success h1:focus {
+  outline: none;
+}
