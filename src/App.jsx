@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { validateForm } from "./validation";
 import "./App.css";
 
 const INITIAL_FORM_DATA = {
@@ -22,13 +23,31 @@ function App() {
   function handleChange(event) {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+
+    if (name === "password" && errors.confirmPassword) {
+      setErrors((prev) => ({ ...prev, confirmPassword: "" }));
+    }
   }
 
   function handleSubmit(event) {
     event.preventDefault();
-    
-    console.log("formData:", formData);
-    console.log("errors:", errors);
+
+    const validationErrors = validateForm(formData);
+    setErrors(validationErrors);
+
+    const hasErrors = Object.values(validationErrors).some(
+      (message) => message !== ""
+    );
+
+    if (hasErrors) {
+      return;
+    }
+
+    console.log("Submitted:", formData);
   }
 
   return (
@@ -40,7 +59,9 @@ function App() {
         </header>
 
         <form className="form" noValidate onSubmit={handleSubmit}>
-          <div className="form__field">
+          <div
+            className={`form__field${errors.fullName ? " form__field--error" : ""}`}
+          >
             <label htmlFor="fullName">Full Name</label>
             <input
               id="fullName"
@@ -50,10 +71,19 @@ function App() {
               placeholder="Jane Doe"
               value={formData.fullName}
               onChange={handleChange}
+              aria-invalid={Boolean(errors.fullName)}
+              aria-describedby={errors.fullName ? "fullName-error" : undefined}
             />
+            {errors.fullName && (
+              <p id="fullName-error" className="form__error" role="alert">
+                {errors.fullName}
+              </p>
+            )}
           </div>
 
-          <div className="form__field">
+          <div
+            className={`form__field${errors.email ? " form__field--error" : ""}`}
+          >
             <label htmlFor="email">Email Address</label>
             <input
               id="email"
@@ -63,10 +93,19 @@ function App() {
               placeholder="jane@example.com"
               value={formData.email}
               onChange={handleChange}
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.email ? "email-error" : undefined}
             />
+            {errors.email && (
+              <p id="email-error" className="form__error" role="alert">
+                {errors.email}
+              </p>
+            )}
           </div>
 
-          <div className="form__field">
+          <div
+            className={`form__field${errors.password ? " form__field--error" : ""}`}
+          >
             <label htmlFor="password">Password</label>
             <input
               id="password"
@@ -76,10 +115,19 @@ function App() {
               placeholder="At least 8 characters"
               value={formData.password}
               onChange={handleChange}
+              aria-invalid={Boolean(errors.password)}
+              aria-describedby={errors.password ? "password-error" : undefined}
             />
+            {errors.password && (
+              <p id="password-error" className="form__error" role="alert">
+                {errors.password}
+              </p>
+            )}
           </div>
 
-          <div className="form__field">
+          <div
+            className={`form__field${errors.confirmPassword ? " form__field--error" : ""}`}
+          >
             <label htmlFor="confirmPassword">Confirm Password</label>
             <input
               id="confirmPassword"
@@ -89,7 +137,20 @@ function App() {
               placeholder="Re-enter your password"
               value={formData.confirmPassword}
               onChange={handleChange}
+              aria-invalid={Boolean(errors.confirmPassword)}
+              aria-describedby={
+                errors.confirmPassword ? "confirmPassword-error" : undefined
+              }
             />
+            {errors.confirmPassword && (
+              <p
+                id="confirmPassword-error"
+                className="form__error"
+                role="alert"
+              >
+                {errors.confirmPassword}
+              </p>
+            )}
           </div>
 
           <button type="submit" className="form__submit">

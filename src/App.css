@@ -117,3 +117,22 @@
     font-size: 1.4rem;
   }
 }
+.form__field--error input {
+  border-color: #dc2626;
+}
+
+.form__field--error input:hover {
+  border-color: #dc2626;
+}
+
+.form__field--error input:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);
+}
+
+.form__error {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
