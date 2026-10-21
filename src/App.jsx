@@ -18,20 +18,52 @@ const INITIAL_ERRORS = {
 
 const FIELD_ORDER = ["fullName", "email", "password", "confirmPassword"];
 
+function FormField({
+  id,
+  label,
+  type,
+  autoComplete,
+  placeholder,
+  value,
+  error,
+  onChange,
+}) {
+  return (
+    <div className={`form__field${error ? " form__field--error" : ""}`}>
+      <label htmlFor={id}>{label}</label>
+      <input
+        id={id}
+        name={id}
+        type={type}
+        autoComplete={autoComplete}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        aria-invalid={error ? "true" : undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
+      />
+      {error && (
+        <p id={`${id}-error`} className="form__error" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function App() {
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState(INITIAL_ERRORS);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [focusTarget, setFocusTarget] = useState(null);
 
-  const fullNameRef = useRef(null);
   const successHeadingRef = useRef(null);
 
   useEffect(() => {
     if (focusTarget === "success") {
       successHeadingRef.current?.focus();
     } else if (focusTarget === "form") {
-      fullNameRef.current?.focus();
+      document.getElementById("fullName")?.focus();
     }
   }, [focusTarget]);
 
@@ -105,106 +137,46 @@ function App() {
             </header>
 
             <form className="form" noValidate onSubmit={handleSubmit}>
-              <div
-                className={`form__field${errors.fullName ? " form__field--error" : ""}`}
-              >
-                <label htmlFor="fullName">Full Name</label>
-                <input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  autoComplete="name"
-                  placeholder="Jane Doe"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  ref={fullNameRef}
-                  aria-invalid={errors.fullName ? "true" : undefined}
-                  aria-describedby={
-                    errors.fullName ? "fullName-error" : undefined
-                  }
-                />
-                {errors.fullName && (
-                  <p id="fullName-error" className="form__error" role="alert">
-                    {errors.fullName}
-                  </p>
-                )}
-              </div>
-
-              <div
-                className={`form__field${errors.email ? " form__field--error" : ""}`}
-              >
-                <label htmlFor="email">Email Address</label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="jane@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  aria-invalid={errors.email ? "true" : undefined}
-                  aria-describedby={errors.email ? "email-error" : undefined}
-                />
-                {errors.email && (
-                  <p id="email-error" className="form__error" role="alert">
-                    {errors.email}
-                  </p>
-                )}
-              </div>
-
-              <div
-                className={`form__field${errors.password ? " form__field--error" : ""}`}
-              >
-                <label htmlFor="password">Password</label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="At least 8 characters"
-                  value={formData.password}
-                  onChange={handleChange}
-                  aria-invalid={errors.password ? "true" : undefined}
-                  aria-describedby={
-                    errors.password ? "password-error" : undefined
-                  }
-                />
-                {errors.password && (
-                  <p id="password-error" className="form__error" role="alert">
-                    {errors.password}
-                  </p>
-                )}
-              </div>
-
-              <div
-                className={`form__field${errors.confirmPassword ? " form__field--error" : ""}`}
-              >
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="Re-enter your password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  aria-invalid={errors.confirmPassword ? "true" : undefined}
-                  aria-describedby={
-                    errors.confirmPassword
-                      ? "confirmPassword-error"
-                      : undefined
-                  }
-                />
-                {errors.confirmPassword && (
-                  <p
-                    id="confirmPassword-error"
-                    className="form__error"
-                    role="alert"
-                  >
-                    {errors.confirmPassword}
-                  </p>
-                )}
-              </div>
+              <FormField
+                id="fullName"
+                label="Full Name"
+                type="text"
+                autoComplete="name"
+                placeholder="Jane Doe"
+                value={formData.fullName}
+                error={errors.fullName}
+                onChange={handleChange}
+              />
+              <FormField
+                id="email"
+                label="Email Address"
+                type="email"
+                autoComplete="email"
+                placeholder="jane@example.com"
+                value={formData.email}
+                error={errors.email}
+                onChange={handleChange}
+              />
+              <FormField
+                id="password"
+                label="Password"
+                type="password"
+                autoComplete="new-password"
+                placeholder="At least 8 characters"
+                value={formData.password}
+                error={errors.password}
+                onChange={handleChange}
+              />
+              <FormField
+                id="confirmPassword"
+                label="Confirm Password"
+                type="password"
+                autoComplete="new-password"
+                placeholder="Re-enter your password"
+                value={formData.confirmPassword}
+                error={errors.confirmPassword}
+                onChange={handleChange}
+              />
 
               <button type="submit" className="form__submit">
                 Create account
