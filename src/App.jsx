@@ -19,6 +19,7 @@ const INITIAL_ERRORS = {
 function App() {
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState(INITIAL_ERRORS);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -47,116 +48,155 @@ function App() {
       return;
     }
 
-    console.log("Submitted:", formData);
+    // نجاح: عرض توضيحي فقط — لا إرسال لأي خادم، ولا تخزين لكلمات المرور.
+    setFormData(INITIAL_FORM_DATA);
+    setErrors(INITIAL_ERRORS);
+    setIsSubmitted(true);
+  }
+
+  function handleReset() {
+    setIsSubmitted(false);
   }
 
   return (
     <main className="page">
       <section className="card" aria-labelledby="form-title">
-        <header className="card__header">
-          <h1 id="form-title">Create your account</h1>
-          <p>Fill in the fields below to register.</p>
-        </header>
-
-        <form className="form" noValidate onSubmit={handleSubmit}>
-          <div
-            className={`form__field${errors.fullName ? " form__field--error" : ""}`}
-          >
-            <label htmlFor="fullName">Full Name</label>
-            <input
-              id="fullName"
-              name="fullName"
-              type="text"
-              autoComplete="name"
-              placeholder="Jane Doe"
-              value={formData.fullName}
-              onChange={handleChange}
-              aria-invalid={Boolean(errors.fullName)}
-              aria-describedby={errors.fullName ? "fullName-error" : undefined}
-            />
-            {errors.fullName && (
-              <p id="fullName-error" className="form__error" role="alert">
-                {errors.fullName}
+        {isSubmitted ? (
+          <div role="status">
+            <header className="card__header card__header--success">
+              <h1 id="form-title">Account created successfully</h1>
+              <p>
+                This is a front-end demonstration — no data was sent to any
+                server.
               </p>
-            )}
-          </div>
+            </header>
 
-          <div
-            className={`form__field${errors.email ? " form__field--error" : ""}`}
-          >
-            <label htmlFor="email">Email Address</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="jane@example.com"
-              value={formData.email}
-              onChange={handleChange}
-              aria-invalid={Boolean(errors.email)}
-              aria-describedby={errors.email ? "email-error" : undefined}
-            />
-            {errors.email && (
-              <p id="email-error" className="form__error" role="alert">
-                {errors.email}
-              </p>
-            )}
+            <button
+              type="button"
+              className="form__submit"
+              onClick={handleReset}
+            >
+              Register another account
+            </button>
           </div>
+        ) : (
+          <>
+            <header className="card__header">
+              <h1 id="form-title">Create your account</h1>
+              <p>Fill in the fields below to register.</p>
+            </header>
 
-          <div
-            className={`form__field${errors.password ? " form__field--error" : ""}`}
-          >
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              placeholder="At least 8 characters"
-              value={formData.password}
-              onChange={handleChange}
-              aria-invalid={Boolean(errors.password)}
-              aria-describedby={errors.password ? "password-error" : undefined}
-            />
-            {errors.password && (
-              <p id="password-error" className="form__error" role="alert">
-                {errors.password}
-              </p>
-            )}
-          </div>
-
-          <div
-            className={`form__field${errors.confirmPassword ? " form__field--error" : ""}`}
-          >
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              placeholder="Re-enter your password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              aria-invalid={Boolean(errors.confirmPassword)}
-              aria-describedby={
-                errors.confirmPassword ? "confirmPassword-error" : undefined
-              }
-            />
-            {errors.confirmPassword && (
-              <p
-                id="confirmPassword-error"
-                className="form__error"
-                role="alert"
+            <form className="form" noValidate onSubmit={handleSubmit}>
+              <div
+                className={`form__field${errors.fullName ? " form__field--error" : ""}`}
               >
-                {errors.confirmPassword}
-              </p>
-            )}
-          </div>
+                <label htmlFor="fullName">Full Name</label>
+                <input
+                  id="fullName"
+                  name="fullName"
+                  type="text"
+                  autoComplete="name"
+                  placeholder="Jane Doe"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(errors.fullName)}
+                  aria-describedby={
+                    errors.fullName ? "fullName-error" : undefined
+                  }
+                />
+                {errors.fullName && (
+                  <p id="fullName-error" className="form__error" role="alert">
+                    {errors.fullName}
+                  </p>
+                )}
+              </div>
 
-          <button type="submit" className="form__submit">
-            Create account
-          </button>
-        </form>
+              <div
+                className={`form__field${errors.email ? " form__field--error" : ""}`}
+              >
+                <label htmlFor="email">Email Address</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="jane@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={errors.email ? "email-error" : undefined}
+                />
+                {errors.email && (
+                  <p id="email-error" className="form__error" role="alert">
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+
+              <div
+                className={`form__field${errors.password ? " form__field--error" : ""}`}
+              >
+                <label htmlFor="password">Password</label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="At least 8 characters"
+                  value={formData.password}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(errors.password)}
+                  aria-describedby={
+                    errors.password ? "password-error" : undefined
+                  }
+                />
+                {errors.password && (
+                  <p id="password-error" className="form__error" role="alert">
+                    {errors.password}
+                  </p>
+                )}
+              </div>
+
+              <div
+                className={`form__field${errors.confirmPassword ? " form__field--error" : ""}`}
+              >
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Re-enter your password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(errors.confirmPassword)}
+                  aria-describedby={
+                    errors.confirmPassword
+                      ? "confirmPassword-error"
+                      : undefined
+                  }
+                />
+                {errors.confirmPassword && (
+                  <p
+                    id="confirmPassword-error"
+                    className="form__error"
+                    role="alert"
+                  >
+                    {errors.confirmPassword}
+                  </p>
+                )}
+              </div>
+
+              <button type="submit" className="form__submit">
+                Create account
+              </button>
+            </form>
+          </>
+        )}
+
+        <p className="card__note">
+          Demo project — no data is submitted or stored.
+        </p>
       </section>
     </main>
   );
